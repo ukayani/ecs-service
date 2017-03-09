@@ -56,8 +56,8 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const run = (client) => {
-  client.test();
+const run = (client, stackname) => {
+  client.deploy(stackname);
   return Promise.resolve('');
 };
 
@@ -68,11 +68,11 @@ program
   .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION');
 
 program
-  .command('test')
-  .description('ECS Service test')
-  .action(() => {
+  .command('deploy [stackname]')
+  .description('Deploy ECS service using CF')
+  .action((stackname) => {
     const client = createClient(program);
-    exitOnFailedPromise(run(client));
+    exitOnFailedPromise(run(client, stackname));
   });
 
 
