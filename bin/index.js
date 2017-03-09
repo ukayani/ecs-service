@@ -57,8 +57,7 @@ const createClient = (program) => {
 };
 
 const run = (client, stackname) => {
-  client.deploy(stackname);
-  return Promise.resolve('');
+  return client.deploy(stackname);
 };
 
 program
