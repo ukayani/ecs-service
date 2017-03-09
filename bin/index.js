@@ -56,22 +56,30 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const run = (client, stackname) => {
-  return client.deploy(stackname);
+const run = (client, stackname, version, envFilePath) => {
+
+  const validate = (stackname, version) => {
+    assert.string(stackname, 'Must provide stackname');
+    assert.string(version, 'Must provide version');
+  };
+
+  exitIfFailed(validate, stackname, version);
+  return client.deploy(stackname, version, path.resolve(envFilePath));
 };
 
 program
   .version(pkg.version)
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
   .option('-s, --secret-access-key <secret>', 'AWS Secret Access Key. Env: $AWS_SECRET_ACCESS_KEY')
-  .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION');
+  .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION')
+  .option('-e, --env-file <file>', 'A .env file to supply to the container');
 
 program
-  .command('deploy [stackname]')
+  .command('deploy [stackname] [version]')
   .description('Deploy ECS service using CF')
-  .action((stackname) => {
+  .action((stackname, version) => {
     const client = createClient(program);
-    exitOnFailedPromise(run(client, stackname));
+    exitOnFailedPromise(run(client, stackname, version, program.envFile));
   });
 
 
