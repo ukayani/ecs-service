@@ -56,7 +56,7 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const updateStack = (client, stackname, version, envFilePath) => {
+const updateStack = (client, stackname, version, envFilePath, tagFilePath) => {
 
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
@@ -64,10 +64,13 @@ const updateStack = (client, stackname, version, envFilePath) => {
   };
 
   exitIfFailed(validate, stackname, version);
-  return client.update(stackname, version, path.resolve(envFilePath));
+  tagFilePath = (tagFilePath)? path.resolve(tagFilePath): tagFilePath;
+  envFilePath = (envFilePath)? path.resolve(envFilePath): envFilePath;
+
+  return client.update(stackname, version, envFilePath, tagFilePath);
 };
 
-const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath) => {
+const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath, tagFilePath) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
@@ -76,7 +79,12 @@ const createStack = (client, stackname, version, templateFilePath, paramsFilePat
   };
 
   exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
-  return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), path.resolve(envFilePath));
+
+  tagFilePath = (tagFilePath)? path.resolve(tagFilePath): tagFilePath;
+  envFilePath = (envFilePath)? path.resolve(envFilePath): envFilePath;
+
+  return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath),
+    envFilePath, tagFilePath);
 };
 
 const destroyStack = (client, stackname) => {
@@ -92,14 +100,15 @@ program
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
   .option('-s, --secret-access-key <secret>', 'AWS Secret Access Key. Env: $AWS_SECRET_ACCESS_KEY')
   .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION')
-  .option('-e, --env-file <file>', 'A .env file to supply to the container');
+  .option('-e, --env-file <file>', 'A .env file to supply to the container')
+  .option('-t, --tag-file <file>', 'A file containing tags for the stack');
 
 program
   .command('create [stackname] [version] [template_file] [params_file]')
   .description('Create ECS service using CF')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
-    exitOnFailedPromise(createStack(client, stackname, version, templateFile, paramsFile, program.envFile));
+    exitOnFailedPromise(createStack(client, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
   });
 
 program
@@ -107,7 +116,7 @@ program
   .description('Deploy ECS service using CF')
   .action((stackname, version) => {
     const client = createClient(program);
-    exitOnFailedPromise(updateStack(client, stackname, version, program.envFile));
+    exitOnFailedPromise(updateStack(client, stackname, version, program.envFile, program.tagFile));
   });
 
 program
