@@ -67,7 +67,7 @@ const updateStack = (client, stackname, version, envFilePath) => {
   return client.update(stackname, version, path.resolve(envFilePath));
 };
 
-const createStack = (client, stackname, templateFilePath, paramsFilePath, envFilePath) => {
+const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
