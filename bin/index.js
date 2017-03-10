@@ -64,8 +64,8 @@ const updateStack = (client, stackname, version, envFilePath, tagFilePath) => {
   };
 
   exitIfFailed(validate, stackname, version);
-  tagFilePath = (tagFilePath)? path.resolve(tagFilePath): tagFilePath;
-  envFilePath = (envFilePath)? path.resolve(envFilePath): envFilePath;
+  tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
+  envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
 
   return client.update(stackname, version, envFilePath, tagFilePath);
 };
@@ -80,11 +80,11 @@ const createStack = (client, stackname, version, templateFilePath, paramsFilePat
 
   exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
 
-  tagFilePath = (tagFilePath)? path.resolve(tagFilePath): tagFilePath;
-  envFilePath = (envFilePath)? path.resolve(envFilePath): envFilePath;
+  tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
+  envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
 
-  return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath),
-    envFilePath, tagFilePath);
+  return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), envFilePath,
+    tagFilePath);
 };
 
 const destroyStack = (client, stackname) => {
@@ -108,7 +108,8 @@ program
   .description('Create ECS service using CF')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
-    exitOnFailedPromise(createStack(client, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
+    exitOnFailedPromise(
+      createStack(client, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
   });
 
 program
