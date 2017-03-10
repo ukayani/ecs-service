@@ -67,16 +67,15 @@ const updateStack = (client, stackname, version, envFilePath) => {
   return client.update(stackname, version, path.resolve(envFilePath));
 };
 
-const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath) => {
-  const validate = (stackname, version, templateFilePath, paramsFilePath) => {
+const createStack = (client, stackname, templateFilePath, paramsFilePath, envFilePath) => {
+  const validate = (stackname, templateFilePath, paramsFilePath) => {
     assert.string(stackname, 'Must provide stackname');
-    assert.string(version, 'Must provide version');
     assert.string(templateFilePath, 'Must provide CF template file path');
     assert.string(paramsFilePath, 'Must provide parameter file path for CF template');
   };
 
-  exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
-  return Promise.resolve("good");
+  exitIfFailed(validate, stackname, templateFilePath, paramsFilePath);
+  return client.create(stackname, path.resolve(templateFilePath), path.resolve(paramsFilePath), path.resolve(envFilePath));
 };
 
 program
@@ -87,11 +86,11 @@ program
   .option('-e, --env-file <file>', 'A .env file to supply to the container');
 
 program
-  .command('create [stackname] [version] [template_file] [params_file]')
+  .command('create [stackname] [template_file] [params_file]')
   .description('Create ECS service using CF')
-  .action((stackname, version, templateFile, paramsFile) => {
+  .action((stackname, templateFile, paramsFile) => {
     const client = createClient(program);
-    exitOnFailedPromise(createStack(client, stackname, version, templateFile, paramsFile, program.envFile));
+    exitOnFailedPromise(createStack(client, stackname, templateFile, paramsFile, program.envFile));
   });
 
 program
