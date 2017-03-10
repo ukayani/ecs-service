@@ -58,7 +58,7 @@ const createClient = (program) => {
 
 const updateStack = (client, stackname, version, envFilePath) => {
 
-  const validate = (stackname, version) => {
+  const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
   };
@@ -67,8 +67,8 @@ const updateStack = (client, stackname, version, envFilePath) => {
   return client.update(stackname, version, path.resolve(envFilePath));
 };
 
-const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath) => {
-  const validate = (stackname, version, templateFilePath, paramsFilePath) => {
+const createStack = (client, stackname, templateFilePath, paramsFilePath, envFilePath) => {
+  const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
     assert.string(templateFilePath, 'Must provide CF template file path');
@@ -77,6 +77,14 @@ const createStack = (client, stackname, version, templateFilePath, paramsFilePat
 
   exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
   return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), path.resolve(envFilePath));
+};
+
+const destroyStack = (client, stackname) => {
+  const validate = () => {
+    assert.string(stackname, 'Must provide stackname');
+  };
+  exitIfFailed(validate);
+  return client.destroy(stackname);
 };
 
 program
@@ -102,6 +110,13 @@ program
     exitOnFailedPromise(updateStack(client, stackname, version, program.envFile));
   });
 
+program
+  .command('destroy [stackname]')
+  .description('Destroy the ECS service')
+  .action((stackname) => {
+    const client = createClient(program);
+    exitOnFailedPromise(destroyStack(client, stackname));
+  });
 
 program.parse(process.argv);
 
