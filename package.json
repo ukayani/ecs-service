@@ -1,6 +1,6 @@
 {
   "name": "ecs-service",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A tool for creating and updating ECS services using Cloud Formation",
   "main": "index.js",
   "bin": {
