@@ -64,7 +64,7 @@ const run = (client, stackname, version, envFilePath) => {
   };
 
   exitIfFailed(validate, stackname, version);
-  return client.deploy(stackname, version, path.resolve(envFilePath));
+  return client.update(stackname, version, path.resolve(envFilePath));
 };
 
 program
