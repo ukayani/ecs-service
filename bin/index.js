@@ -56,7 +56,7 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const run = (client, stackname, version, envFilePath) => {
+const updateStack = (client, stackname, version, envFilePath) => {
 
   const validate = (stackname, version) => {
     assert.string(stackname, 'Must provide stackname');
@@ -67,6 +67,18 @@ const run = (client, stackname, version, envFilePath) => {
   return client.update(stackname, version, path.resolve(envFilePath));
 };
 
+const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath) => {
+  const validate = (stackname, version, templateFilePath, paramsFilePath) => {
+    assert.string(stackname, 'Must provide stackname');
+    assert.string(version, 'Must provide version');
+    assert.string(templateFilePath, 'Must provide CF template file path');
+    assert.string(paramsFilePath, 'Must provide parameter file path for CF template');
+  };
+
+  exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
+  return Promise.resolve("good");
+};
+
 program
   .version(pkg.version)
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
@@ -75,11 +87,19 @@ program
   .option('-e, --env-file <file>', 'A .env file to supply to the container');
 
 program
+  .command('create [stackname] [version] [template_file] [params_file]')
+  .description('Create ECS service using CF')
+  .action((stackname, version, templateFile, paramsFile) => {
+    const client = createClient(program);
+    exitOnFailedPromise(createStack(client, stackname, version, templateFile, paramsFile, program.envFile));
+  });
+
+program
   .command('deploy [stackname] [version]')
   .description('Deploy ECS service using CF')
   .action((stackname, version) => {
     const client = createClient(program);
-    exitOnFailedPromise(run(client, stackname, version, program.envFile));
+    exitOnFailedPromise(updateStack(client, stackname, version, program.envFile));
   });
 
 
