@@ -52,6 +52,12 @@ const createClient = (program) => {
     secretAccessKey: options.secretAccessKey,
     region: options.region
   };
+
+  if (options.profile) {
+    // configure the AWS profile if they specified it via options
+    process.env.AWS_PROFILE = options.profile;
+  }
+
   const client = new AWS.CloudFormation(config);
   return ServiceManager.create(client, fs);
 };
@@ -100,6 +106,7 @@ program
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
   .option('-s, --secret-access-key <secret>', 'AWS Secret Access Key. Env: $AWS_SECRET_ACCESS_KEY')
   .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION')
+  .option('-p, --profile <name>', 'AWS credential profile to use')
   .option('-e, --env-file <file>', 'A .env file to supply to the container')
   .option('-t, --tag-file <file>', 'A file containing tags for the stack');
 
