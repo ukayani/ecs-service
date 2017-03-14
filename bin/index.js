@@ -62,7 +62,7 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const updateStack = (client, stackname, version, envFilePath, tagFilePath) => {
+const deployStack = (client, stackname, version, envFilePath, tagFilePath) => {
 
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
@@ -73,7 +73,7 @@ const updateStack = (client, stackname, version, envFilePath, tagFilePath) => {
   tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
   envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
 
-  return client.update(stackname, version, envFilePath, tagFilePath);
+  return client.deploy(stackname, version, envFilePath, tagFilePath);
 };
 
 const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath, tagFilePath) => {
@@ -124,7 +124,7 @@ program
   .description('Deploy ECS service using CF')
   .action((stackname, version) => {
     const client = createClient(program);
-    exitOnFailedPromise(updateStack(client, stackname, version, program.envFile, program.tagFile));
+    exitOnFailedPromise(deployStack(client, stackname, version, program.envFile, program.tagFile));
   });
 
 program
