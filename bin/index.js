@@ -76,7 +76,7 @@ const deployStack = (client, stackname, version, envFilePath, tagFilePath) => {
   return client.deploy(stackname, version, envFilePath, tagFilePath);
 };
 
-const createStack = (client, stackname, version, templateFilePath, paramsFilePath, envFilePath, tagFilePath) => {
+const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, envFilePath, tagFilePath) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
@@ -89,7 +89,7 @@ const createStack = (client, stackname, version, templateFilePath, paramsFilePat
   tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
   envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
 
-  return client.create(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), envFilePath,
+  return stackOp(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), envFilePath,
     tagFilePath);
 };
 
@@ -116,12 +116,21 @@ program
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
     exitOnFailedPromise(
-      createStack(client, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
+      processStack(client.create, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
+  });
+
+program
+  .command('update [stackname] [version] [template_file] [params_file]')
+  .description('Update ECS service using CF')
+  .action((stackname, version, templateFile, paramsFile) => {
+    const client = createClient(program);
+    exitOnFailedPromise(
+      processStack(client.update, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
   });
 
 program
   .command('deploy [stackname] [version]')
-  .description('Deploy ECS service using CF')
+  .description('Deploy ECS service using CF. Use this if you are not updating the template')
   .action((stackname, version) => {
     const client = createClient(program);
     exitOnFailedPromise(deployStack(client, stackname, version, program.envFile, program.tagFile));
