@@ -31,20 +31,22 @@ const exitOnFailedPromise = (promise) => promise.catch(err => {
   process.exit(1);
 });
 
-const getOptions = (options) => {
+const getAWSOptions = (options) => {
   const accessKey = options.accessKeyId;
   const secretKey = options.secretAccessKey;
   const region = options.region;
+  const profile = options.profile;
 
   return {
     accessKeyId: accessKey,
     secretAccessKey: secretKey,
-    region
+    region,
+    profile
   };
 };
 
 const createClient = (program) => {
-  const options = exitIfFailed(getOptions, program);
+  const options = exitIfFailed(getAWSOptions, program);
 
   const config = {
     apiVersion: '2010-05-15',
@@ -62,7 +64,15 @@ const createClient = (program) => {
   return ServiceManager.create(client, fs);
 };
 
-const deployStack = (client, stackname, version, envFilePath, tagFilePath) => {
+const getServiceOptions = (options) => {
+  return {
+    tagFilePath: (options.tagFilePath) ? path.resolve(options.tagFilePath) : options.tagFilePath,
+    envFilePath: (options.envFilePath) ? path.resolve(options.envFilePath) : options.envFilePath,
+    scale: (options.count) ? options.count: 1
+  };
+};
+
+const runStack = (client, stackname, version, options) => {
 
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
@@ -70,13 +80,11 @@ const deployStack = (client, stackname, version, envFilePath, tagFilePath) => {
   };
 
   exitIfFailed(validate, stackname, version);
-  tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
-  envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
 
-  return client.deploy(stackname, version, envFilePath, tagFilePath);
+  return client.run(stackname, version, options);
 };
 
-const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, envFilePath, tagFilePath) => {
+const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, options) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
@@ -86,11 +94,7 @@ const processStack = (stackOp, stackname, version, templateFilePath, paramsFileP
 
   exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
 
-  tagFilePath = (tagFilePath) ? path.resolve(tagFilePath) : tagFilePath;
-  envFilePath = (envFilePath) ? path.resolve(envFilePath) : envFilePath;
-
-  return stackOp(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), envFilePath,
-    tagFilePath);
+  return stackOp(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), options);
 };
 
 const destroyStack = (client, stackname) => {
@@ -103,6 +107,7 @@ const destroyStack = (client, stackname) => {
 
 program
   .version(pkg.version)
+  .option('-s, --scale <count>', 'Number of instances of service to run. Default: 1.')
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
   .option('-s, --secret-access-key <secret>', 'AWS Secret Access Key. Env: $AWS_SECRET_ACCESS_KEY')
   .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION')
@@ -115,8 +120,9 @@ program
   .description('Create ECS service using CF')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
+    const options = getServiceOptions(program);
     exitOnFailedPromise(
-      processStack(client.create, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
+      processStack(client.create, stackname, version, templateFile, paramsFile, options));
   });
 
 program
@@ -124,8 +130,9 @@ program
   .description('Update ECS service using CF')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
+    const options = getServiceOptions(program);
     exitOnFailedPromise(
-      processStack(client.update, stackname, version, templateFile, paramsFile, program.envFile, program.tagFile));
+      processStack(client.update, stackname, version, templateFile, paramsFile, options));
   });
 
 program
@@ -133,7 +140,8 @@ program
   .description('Deploy ECS service using CF. Use this if you are not updating the template')
   .action((stackname, version) => {
     const client = createClient(program);
-    exitOnFailedPromise(deployStack(client, stackname, version, program.envFile, program.tagFile));
+    const options = getServiceOptions(program);
+    exitOnFailedPromise(runStack(client, stackname, version, options));
   });
 
 program
