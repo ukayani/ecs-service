@@ -6,7 +6,6 @@ const path = require('path');
 const assert = require('assert-plus');
 const program = require('commander');
 const chalk = require('chalk');
-const AWS = require('aws-sdk');
 const ServiceManager = require('../lib').ServiceManager;
 const fs = require('../lib/file.utils');
 
@@ -60,6 +59,8 @@ const createClient = (program) => {
     process.env.AWS_PROFILE = options.profile;
   }
 
+  // need to load the AWS sdk after we set the process env for AWS_PROFILE
+  const AWS = require('aws-sdk');
   const client = new AWS.CloudFormation(config);
   return ServiceManager.create(client, fs);
 };
@@ -68,7 +69,7 @@ const getServiceOptions = (options) => {
   return {
     tagFilePath: (options.tagFile) ? path.resolve(options.tagFile) : options.tagFile,
     envFilePath: (options.envFile) ? path.resolve(options.envFile) : options.envFile,
-    scale: options.count
+    scale: options.scale
   };
 };
 
