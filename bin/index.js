@@ -66,8 +66,8 @@ const createClient = (program) => {
 
 const getServiceOptions = (options) => {
   return {
-    tagFilePath: (options.tagFilePath) ? path.resolve(options.tagFilePath) : options.tagFilePath,
-    envFilePath: (options.envFilePath) ? path.resolve(options.envFilePath) : options.envFilePath,
+    tagFilePath: (options.tagFile) ? path.resolve(options.tagFile) : options.tagFile,
+    envFilePath: (options.envFile) ? path.resolve(options.envFile) : options.envFile,
     scale: options.count
   };
 };
@@ -107,7 +107,7 @@ const destroyStack = (client, stackname) => {
 
 program
   .version(pkg.version)
-  .option('-s, --scale <count>', 'Number of instances of service to run. Default: 1')
+  .option('-s, --scale <count>', 'Number of instances of service to run')
   .option('-k, --access-key-id <id>', 'AWS Access key ID. Env: $AWS_ACCESS_KEY_ID')
   .option('-s, --secret-access-key <secret>', 'AWS Secret Access Key. Env: $AWS_SECRET_ACCESS_KEY')
   .option('-r, --region <region>', 'AWS Region. Env: $AWS_REGION')
@@ -136,8 +136,8 @@ program
   });
 
 program
-  .command('deploy [stackname] [version]')
-  .description('Deploy ECS service using CF. Use this if you are not updating the template')
+  .command('run [stackname] [version]')
+  .description('Run ECS service using CF. Use this if you are not updating the template.')
   .action((stackname, version) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
