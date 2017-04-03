@@ -26,7 +26,6 @@ function exitIfFailed(fn) {
 
 const exitOnFailedPromise = (promise) => promise.catch(err => {
   console.error(chalk.red(err.message));
-  showHelp();
   process.exit(1);
 });
 
