@@ -80,10 +80,22 @@ const runStack = (client, stackname, version, options) => {
     assert.string(version, 'Must provide version');
   };
 
-  exitIfFailed(validate, stackname, version);
+  exitIfFailed(validate);
 
   return client.run(stackname, version, options);
 };
+
+const stopStack = (client, stackname) => {
+
+  const validate = () => {
+    assert.string(stackname, 'Must provide stackname');
+  };
+
+  exitIfFailed(validate);
+
+  return client.stop(stackname);
+};
+
 
 const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, options) => {
   const validate = () => {
@@ -93,7 +105,7 @@ const processStack = (stackOp, stackname, version, templateFilePath, paramsFileP
     assert.string(paramsFilePath, 'Must provide parameter file path for CF template');
   };
 
-  exitIfFailed(validate, stackname, version, templateFilePath, paramsFilePath);
+  exitIfFailed(validate);
 
   return stackOp(stackname, version, path.resolve(templateFilePath), path.resolve(paramsFilePath), options);
 };
@@ -143,6 +155,14 @@ program
     const client = createClient(program);
     const options = getServiceOptions(program);
     exitOnFailedPromise(runStack(client, stackname, version, options));
+  });
+
+program
+  .command('stop [stackname]')
+  .description('Stops ecs service. Sets the scale to 0.')
+  .action((stackname, version) => {
+    const client = createClient(program);
+    exitOnFailedPromise(stopStack(client, stackname));
   });
 
 program
