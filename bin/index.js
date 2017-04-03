@@ -96,7 +96,6 @@ const stopStack = (client, stackname) => {
   return client.stop(stackname);
 };
 
-
 const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, options) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
@@ -134,8 +133,7 @@ program
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
-    exitOnFailedPromise(
-      processStack(client.create, stackname, version, templateFile, paramsFile, options));
+    exitOnFailedPromise(processStack(client.create, stackname, version, templateFile, paramsFile, options));
   });
 
 program
@@ -144,8 +142,7 @@ program
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
-    exitOnFailedPromise(
-      processStack(client.update, stackname, version, templateFile, paramsFile, options));
+    exitOnFailedPromise(processStack(client.update, stackname, version, templateFile, paramsFile, options));
   });
 
 program
@@ -160,7 +157,7 @@ program
 program
   .command('stop [stackname]')
   .description('Stops ecs service. Sets the scale to 0.')
-  .action((stackname, version) => {
+  .action((stackname) => {
     const client = createClient(program);
     exitOnFailedPromise(stopStack(client, stackname));
   });
