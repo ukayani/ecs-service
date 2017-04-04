@@ -119,11 +119,45 @@ can use the `update` command. The format of the `update` command is identical to
 $ ecs-service update [stackname] [version] [template_file] [params_file]
 ```
 
-
 ## Run Service
+
+If you need to run a new version of your service or update environment variables you can use the simpler `run` command.
+
+This command requires:
+
+- **stackname** - The name of the existing service stack.
+- **version** - The version label for the service. A corresponding tag should exist in your docker registry.
+
+```bash
+$ ecs-service run [stackname] [version]
+```
+
+This command will update your ecs service to use the specified version of your container image.
+
+### Environment Variables
+
+As mentioned under the `create` command, you can use the `--env-file` parameter to supply a file containing
+environment variables for your container.
 
 ## Stop Service
 
+To stop a service, you can issue the `stop` command which will set the *desired count* of your service to 0.
+
+```bash
+$ ecs-service stop [stackname]
+```
+
+**Note**: this will not remove/delete your ECS service or Task Definition.
+
 ## Destroy Service
 
+To completely remove the resources associates with your service stack you can use the `destroy` command.
+
+This command will result in a stack deletion operation.
+
+```bash
+$ ecs-service destroy [stackname]
+```
+
 # Optional Parameters
+
