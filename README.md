@@ -54,6 +54,55 @@ export AWS_REGION=us-east-1
 
 ## Create Service
 
+To create a service for the first time, you must provide:
+
+- **stackname** - The name of the service you wish to create (this will be the name of the CF Stack)
+- **version** - The version of the service you wish to run. This version should exist in your backing docker repository as a tag.
+- **template file** - A JSON Cloud Formation template containing your ECS Service and Task Definition
+- **parameter file** - A file containing a key value JSON object which maps your template parameter's to their values.
+
+To create the service, use the following command:
+
+```bash
+$ ecs-service create [stackname] [version] [template_file] [params_file]
+```
+
+This command will create an CF stack called with the provided `stackname`,
+it will supply the service version via the `AppVersion` parameter. For the remaining non-default parameters, it will
+use the `parameter file`.
+
+The tool will wait until the successful creation of the stack.
+
+### Supplying Environment Variables to your docker service
+
+If your docker service is configured via Environment Variables you must
+supply them via the TaskDefinition's Container Definition's `Environment` property.
+This can be tedious to update when your environment variables change.
+
+`ecs-service` allows you to supply a `env` file when creating/updating services which
+will be used to populate the Container Definition's Environment property.
+
+The `--env-file` parameter can be used to supply an `env` file containing all of
+your environment variables.
+
+**Example ENV file**
+
+```bash
+EXTERNAL_SERVICE_URI=http://api.myservice.com
+FOO=test
+BAR=blah
+```
+
+Each line defines an environment variable.
+
+**Example Usage**
+
+Using the `--env-file` parameter, you can supply a `env` file which will be used to pass environment variables to your container.
+
+```bash
+$ ecs-service create [stackname] [version] [template_file] [params_file] --env-file <file>
+```
+
 ## Update Service
 
 ## Run Service
