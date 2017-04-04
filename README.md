@@ -59,7 +59,7 @@ export AWS_REGION=us-east-1
 
 The tool will use the standard credential chain used by other aws cli tools.
 
-If you wish to supply credentials manually see [Options](#optional-parameters)
+If you wish to supply credentials manually see [Options](#aws-credentials)
 
 # Supported Commands
 
