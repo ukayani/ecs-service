@@ -21,6 +21,11 @@ CF stack with the name you provide.
 After the service is created, you can issue commands to update the running
 version of the service which will result in a stack update.
 
+Instead of having a separate CF template per environment, the idea is to have a single
+template which works across all environments. Because the tool lets you supply
+parameters and environment variables to your docker container, your stack template can
+remain the same between environments.
+
 # Requirements
 
 - NodeJS v6.x or newer
@@ -103,7 +108,17 @@ Using the `--env-file` parameter, you can supply a `env` file which will be used
 $ ecs-service create [stackname] [version] [template_file] [params_file] --env-file <file>
 ```
 
+This parameter can be used with any of the commands provided.
+
 ## Update Service
+
+If you need to update the template for a service or the stack parameters, you
+can use the `update` command. The format of the `update` command is identical to the `create` command.
+
+```bash
+$ ecs-service update [stackname] [version] [template_file] [params_file]
+```
+
 
 ## Run Service
 
@@ -111,3 +126,4 @@ $ ecs-service create [stackname] [version] [template_file] [params_file] --env-f
 
 ## Destroy Service
 
+# Optional Parameters
