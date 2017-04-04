@@ -55,6 +55,12 @@ or supply it via the `-r` parameter.
 export AWS_REGION=us-east-1
 ```
 
+**AWS Credentials**
+
+The tool will use the standard credential chain used by other aws cli tools.
+
+If you wish to supply credentials manually see [Options](#optional-parameters)
+
 # Supported Commands
 
 ## Create Service
@@ -110,15 +116,6 @@ $ ecs-service create [stackname] [version] [template_file] [params_file] --env-f
 
 This parameter can be used with any of the commands provided.
 
-## Update Service
-
-If you need to update the template for a service or the stack parameters, you
-can use the `update` command. The format of the `update` command is identical to the `create` command.
-
-```bash
-$ ecs-service update [stackname] [version] [template_file] [params_file]
-```
-
 ## Run Service
 
 If you need to run a new version of your service or update environment variables you can use the simpler `run` command.
@@ -138,6 +135,15 @@ This command will update your ecs service to use the specified version of your c
 
 As mentioned under the `create` command, you can use the `--env-file` parameter to supply a file containing
 environment variables for your container.
+
+## Update Service
+
+If you need to update the template for a service or the stack parameters, you
+can use the `update` command. The format of the `update` command is identical to the `create` command.
+
+```bash
+$ ecs-service update [stackname] [version] [template_file] [params_file]
+```
 
 ## Stop Service
 
@@ -161,3 +167,53 @@ $ ecs-service destroy [stackname]
 
 # Optional Parameters
 
+### Setting the scale for your service
+
+To specify the number of instances of your service to run, use the `--scale` parameter.
+
+**Example**
+
+To run two instances of an existing service called `myservice` we can issue the following command:
+
+```bash
+$ ecs-service run myservice 0.1.0 --scale 2
+```
+
+### Specifying AWS Tags for the service stack
+
+If you need your service stack to have associated tags, you can do so via the `--tag-file` parameter.
+
+**Example**
+
+A tag file is a JSON file with an object where the keys are names of tags to create and values are the tag values.
+
+*Example Tag File - tags.json*
+
+```json
+{
+    "Owner": "Alice",
+    "Project": "Top Secret"
+}
+```
+
+Given the above tag file we can provide it via the `--tag-file` command as follows:
+
+```bash
+$ ecs-service create myservice 0.1.0 service.json params.json --tag-file tags.json
+```
+
+The above command will create `myservice` using the template in `service.json` with the tags `Owner=Alice` and `Project=Top Secret`
+
+### AWS Credentials
+
+To supply credentials manually you can use the following parameters:
+
+- **--access-key-id** - To specify your access key ID
+- **--secret-access-key** - To specify your secret
+- **--region** - To specify the AWS Region
+
+**Using Profiles**
+
+Alternatively you can supply an AWS credential profile to use via:
+
+- **--profile** - To use a credential profile instead of supplying access key and secret
