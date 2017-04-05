@@ -87,7 +87,7 @@ The tool will wait until the successful creation of the stack.
 ### Supplying Environment Variables to your docker service
 
 If your docker service is configured via Environment Variables you must
-supply them via the TaskDefinition's Container Definition's `Environment` property.
+supply them via the TaskDefinition's Container Definition's [Environment](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_environment) property.
 This can be tedious to update when your environment variables change.
 
 `ecs-service` allows you to supply a `env` file when creating/updating services which
@@ -133,7 +133,7 @@ This command will update your ecs service to use the specified version of your c
 
 ### Environment Variables
 
-As mentioned under the `create` command, you can use the `--env-file` parameter to supply a file containing
+As mentioned under the [Create](#supplying-environment-variables-to-your-docker-service) command, you can use the `--env-file` parameter to supply a file containing
 environment variables for your container.
 
 ## Update Service
