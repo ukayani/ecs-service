@@ -81,7 +81,7 @@ const runStack = (client, stackname, version, options) => {
 
   exitIfFailed(validate);
 
-  return client.run(stackname, (version === 'current') ? null: version, options);
+  return client.run(stackname, (version === 'current') ? null : version, options);
 };
 
 const stopStack = (client, stackname) => {
@@ -105,7 +105,8 @@ const processStack = (stackOp, stackname, version, templateFilePath, paramsFileP
 
   exitIfFailed(validate);
 
-  return stackOp(stackname, (version === 'current') ? null: version, path.resolve(templateFilePath), path.resolve(paramsFilePath), options);
+  return stackOp(stackname, (version === 'current') ? null : version, path.resolve(templateFilePath),
+    path.resolve(paramsFilePath), options);
 };
 
 const destroyStack = (client, stackname) => {
@@ -137,7 +138,8 @@ program
 
 program
   .command('update [stackname] [version] [template_file] [params_file]')
-  .description('Update ECS service using CF. Use "current" for version if you want to use the currently running version.')
+  .description(
+    'Update ECS service using CF. Use "current" for version if you want to use the currently running version.')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
@@ -146,7 +148,8 @@ program
 
 program
   .command('run [stackname] [version]')
-  .description('Run ECS service using CF. Use this if you are not updating the template. Use "current" for version if you want to use the currently running version.')
+  .description(
+    'Run ECS service using CF. Use this if you are not updating the template. Use "current" for version if you want to use the currently running version.')
   .action((stackname, version) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
