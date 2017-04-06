@@ -138,7 +138,7 @@ This command will update your ecs service to use the specified version of your c
 
 ### Environment Variables
 
-As mentioned under the [Create](#supplying-environment-variables-to-your-docker-service) command, you can use the `--env-file` parameter to supply a file containing
+As mentioned under the [Deploy](#supplying-environment-variables-to-your-docker-service) command, you can use the `--env-file` parameter to supply a file containing
 environment variables for your container.
 
 ## Stop Service
