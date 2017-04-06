@@ -72,7 +72,7 @@ const getServiceOptions = (options) => {
   };
 };
 
-const runStack = (client, stackname, version, options) => {
+const updateStack = (client, stackname, version, options) => {
 
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
@@ -95,7 +95,7 @@ const stopStack = (client, stackname) => {
   return client.stop(stackname);
 };
 
-const processStack = (stackOp, stackname, version, templateFilePath, paramsFilePath, options) => {
+const deployStack = (client, stackname, version, templateFilePath, paramsFilePath, options) => {
   const validate = () => {
     assert.string(stackname, 'Must provide stackname');
     assert.string(version, 'Must provide version');
@@ -105,7 +105,7 @@ const processStack = (stackOp, stackname, version, templateFilePath, paramsFileP
 
   exitIfFailed(validate);
 
-  return stackOp(stackname, (version === 'current') ? null : version, path.resolve(templateFilePath),
+  return client.deploy(stackname, (version === 'current') ? null : version, path.resolve(templateFilePath),
     path.resolve(paramsFilePath), options);
 };
 
@@ -128,32 +128,22 @@ program
   .option('-t, --tag-file <file>', 'A file containing tags for the stack');
 
 program
-  .command('create [stackname] [version] [template_file] [params_file]')
-  .description('Create ECS service using CF')
+  .command('deploy [stackname] [version] [template_file] [params_file]')
+  .description('Create/Update ECS service using provided template.')
   .action((stackname, version, templateFile, paramsFile) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
-    exitOnFailedPromise(processStack(client.create, stackname, version, templateFile, paramsFile, options));
+    exitOnFailedPromise(deployStack(client, stackname, version, templateFile, paramsFile, options));
   });
 
 program
-  .command('update [stackname] [version] [template_file] [params_file]')
+  .command('update [stackname] [version]')
   .description(
-    'Update ECS service using CF. Use "current" for version if you want to use the currently running version.')
-  .action((stackname, version, templateFile, paramsFile) => {
-    const client = createClient(program);
-    const options = getServiceOptions(program);
-    exitOnFailedPromise(processStack(client.update, stackname, version, templateFile, paramsFile, options));
-  });
-
-program
-  .command('run [stackname] [version]')
-  .description(
-    'Run ECS service using CF. Use this if you are not updating the template. Use "current" for version if you want to use the currently running version.')
+    'Update ECS service to a specific version. Use this if you are not updating the template. Use "current" for version if you want to use the currently running version.')
   .action((stackname, version) => {
     const client = createClient(program);
     const options = getServiceOptions(program);
-    exitOnFailedPromise(runStack(client, stackname, version, options));
+    exitOnFailedPromise(updateStack(client, stackname, version, options));
   });
 
 program
