@@ -141,15 +141,6 @@ This command will update your ecs service to use the specified version of your c
 As mentioned under the [Create](#supplying-environment-variables-to-your-docker-service) command, you can use the `--env-file` parameter to supply a file containing
 environment variables for your container.
 
-## Update Service
-
-If you need to update the template for a service or the stack parameters, you
-can use the `update` command. The format of the `update` command is identical to the `create` command.
-
-```bash
-$ ecs-service update [stackname] [version] [template_file] [params_file]
-```
-
 ## Stop Service
 
 To stop a service, you can issue the `stop` command which will set the *desired count* of your service to 0.
