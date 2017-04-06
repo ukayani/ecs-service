@@ -63,26 +63,27 @@ If you wish to supply credentials manually see [Options](#aws-credentials)
 
 # Supported Commands
 
-## Create Service
+## Deploy Service
 
-To create a service for the first time, you must provide:
+To create or update an existing service you must provide:
 
 - **stackname** - The name of the service you wish to create (this will be the name of the CF Stack)
-- **version** - The version of the service you wish to run. This version should exist in your backing docker repository as a tag.
+- **version**
+    - The version of the service you wish to run. This version should exist in your backing docker repository as a tag.
+    - If you do not wish to change the running version specify `current` as the version. (Only applicable for existing services)
 - **template file** - A JSON Cloud Formation template containing your ECS Service and Task Definition
 - **parameter file** - A file containing a key value JSON object which maps your template parameter's to their values.
 
-To create the service, use the following command:
+To deploy the service, use the following command:
 
 ```bash
-$ ecs-service create [stackname] [version] [template_file] [params_file]
+$ ecs-service deploy [stackname] [version] [template_file] [params_file]
 ```
 
-This command will create an CF stack called with the provided `stackname`,
-it will supply the service version via the `AppVersion` parameter. For the remaining non-default parameters, it will
-use the `parameter file`.
+This command will create/update a CF stack with the provided `stackname` and supply the service version via the `AppVersion` parameter.
+For the remaining non-default parameters, it will use the `parameter file`.
 
-The tool will wait until the successful creation of the stack.
+The command will wait until the successful creation/update of the stack.
 
 ### Supplying Environment Variables to your docker service
 
@@ -111,22 +112,26 @@ Each line defines an environment variable.
 Using the `--env-file` parameter, you can supply a `env` file which will be used to pass environment variables to your container.
 
 ```bash
-$ ecs-service create [stackname] [version] [template_file] [params_file] --env-file <file>
+$ ecs-service deploy [stackname] [version] [template_file] [params_file] --env-file <file>
 ```
 
 This parameter can be used with any of the commands provided.
 
-## Run Service
+## Update Service
 
 If you need to run a new version of your service or update environment variables you can use the simpler `run` command.
+Instead of having to provide a template and parameter files you can use this command if you only need to adjust the version
+or [scale](#setting-the-scale-for-your-service) of your service.
 
 This command requires:
 
 - **stackname** - The name of the existing service stack.
-- **version** - The version label for the service. A corresponding tag should exist in your docker registry.
+- **version**
+    - The version label for the service. A corresponding tag should exist in your docker registry.
+    - If you do not wish to change the running version specify `current` as the version.
 
 ```bash
-$ ecs-service run [stackname] [version]
+$ ecs-service update [stackname] [version]
 ```
 
 This command will update your ecs service to use the specified version of your container image.
@@ -176,7 +181,7 @@ To specify the number of instances of your service to run, use the `--scale` par
 To run two instances of an existing service called `myservice` we can issue the following command:
 
 ```bash
-$ ecs-service run myservice 0.1.0 --scale 2
+$ ecs-service update myservice 0.1.0 --scale 2
 ```
 
 ### Specifying AWS Tags for the service stack
@@ -199,7 +204,7 @@ A tag file is a JSON file with an object where the keys are names of tags to cre
 Given the above tag file we can provide it via the `--tag-file` command as follows:
 
 ```bash
-$ ecs-service create myservice 0.1.0 service.json params.json --tag-file tags.json
+$ ecs-service deploy myservice 0.1.0 service.json params.json --tag-file tags.json
 ```
 
 The above command will create `myservice` using the template in `service.json` with the tags `Owner=Alice` and `Project=Top Secret`
