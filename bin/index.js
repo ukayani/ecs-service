@@ -81,7 +81,7 @@ const updateStack = (client, stackname, version, options) => {
 
   exitIfFailed(validate);
 
-  return client.run(stackname, (version === 'current') ? null : version, options);
+  return client.update(stackname, (version === 'current') ? null : version, options);
 };
 
 const stopStack = (client, stackname) => {
