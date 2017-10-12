@@ -85,11 +85,11 @@ For the remaining non-default parameters, it will use the `parameter file`.
 
 The command will wait until the successful creation/update of the stack.
 
-### Supplying Environment Variables to your docker service
+### Supplying Environment Variables to your docker container
 
-If your docker service is configured via Environment Variables you must
-supply them via the TaskDefinition's Container Definition's [Environment](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_environment) property.
-This can be tedious to update when your environment variables change.
+If your docker container is configured via Environment Variables you must
+supply them via the Container Definition's [Environment](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_environment) property.
+This can be tedious to update when your environment variables change. Hardcoding environment specific values in your task definition would require you to maintain several copies of your task definition; one per environment.
 
 `ecs-service` allows you to supply a `env` file when creating/updating services which
 will be used to populate the Container Definition's Environment property.
@@ -116,6 +116,10 @@ $ ecs-service deploy [stackname] [version] [template_file] [params_file] --env-f
 ```
 
 This parameter can be used with any of the commands provided.
+
+**Encrypting Environment Variables**
+
+Encrypted environment variables can be supplied to your docker container using [kms-env](https://github.com/ukayani/kms-env). 
 
 ## Update Service
 
